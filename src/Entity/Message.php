@@ -150,7 +150,7 @@ class Message
         return $this->updatedAt - $this->startedAt;
     }
 
-    public function getFromCreateToStartTime()
+    public function getTimeFromCreateToStart()
     {
         if ($this->state == State::PENDING) {
             return false;
@@ -159,7 +159,7 @@ class Message
         return $this->startedAt - $this->createdAt;
     }
 
-    public function getFromCreateToFinalizedTime()
+    public function getTimeFromCreateToFinalized()
     {
         if ($this->state != State::FINALIZED) {
             return false;
