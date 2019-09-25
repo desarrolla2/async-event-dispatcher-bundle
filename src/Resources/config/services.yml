@@ -1,0 +1,5 @@
+services:
+
+  desarrolla2.async_event_dispatcher:
+    class: 'Desarrolla2\AsyncEventDispatcherBundle\EventDispatcher\AsyncEventDispatcher'
+    arguments: ['@doctrine.orm.entity_manager']
