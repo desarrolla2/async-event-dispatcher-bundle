@@ -68,8 +68,6 @@ class ConsumerCommand extends AbstractCommand
 
         foreach ($messages as $message) {
             $this->checkAndExecuteMessage($message);
-
-            ldd($message->getExecutionTime(), $message->getSecondsFromCreateToFinalized(), $message->getSecondsFromCreateToStart());
         }
     }
 
