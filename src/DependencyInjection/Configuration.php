@@ -29,9 +29,10 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('async_event_dispatcher');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode
+            ->children()
+                ->scalarNode('num_messages_per_execution')->defaultValue(1)->end()
+            ->end();
 
         return $treeBuilder;
     }
