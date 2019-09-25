@@ -147,24 +147,24 @@ class Message
             return false;
         }
         
-        return $this->updatedAt - $this->startedAt;
+        return $this->updatedAt->getTimestamp() - $this->startedAt->getTimestamp();
     }
 
-    public function getTimeFromCreateToStart()
+    public function getSecondsFromCreateToStart()
     {
         if ($this->state == State::PENDING) {
             return false;
         }
         
-        return $this->startedAt - $this->createdAt;
+        return $this->startedAt->getTimestamp() - $this->createdAt->getTimestamp();
     }
 
-    public function getTimeFromCreateToFinalized()
+    public function getSecondsFromCreateToFinalized()
     {
         if ($this->state != State::FINALIZED) {
             return false;
         }
         
-        return $this->updatedAt - $this->createdAt;
+        return $this->updatedAt->getTimestamp() - $this->createdAt->getTimestamp();
     }
 }
