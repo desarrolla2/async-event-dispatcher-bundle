@@ -1,0 +1,17 @@
+{
+  "name": "desarrolla2/async-event-dispatcher-bundle",
+  "type": "symfony-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Daniel González",
+      "email": "daniel@desarrolla2.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Desarrolla2\\AsyncEventDispatcherBundle\\": "src/"
+    }
+  },
+  "require": {}
+}
