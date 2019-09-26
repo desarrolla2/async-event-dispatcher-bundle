@@ -91,12 +91,12 @@ class Message
         return $this->state;
     }
 
-    public function getStartedAt(): DateTime
+    public function getStartedAt(): ?DateTime
     {
         return $this->startedAt;
     }
 
-    public function getUpdatedAt(): DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
@@ -141,30 +141,64 @@ class Message
         $this->updatedAt = $updatedAt;
     }
 
-    public function getExecutionTime()
-    {
-        if ($this->state != State::FINALIZED) {
-            return false;
-        }
-        
-        return $this->updatedAt->getTimestamp() - $this->startedAt->getTimestamp();
-    }
-
-    public function getSecondsFromCreateToStart()
+    public function getExecutionTime($toMinutes = false)
     {
         if ($this->state == State::PENDING) {
             return false;
         }
-        
-        return $this->startedAt->getTimestamp() - $this->createdAt->getTimestamp();
+
+        $timeToUse = $this->updatedAt->getTimestamp();
+        if ($this->state == State::EXECUTING) {
+            $timeToUse = (new \DateTime())->getTimestamp();
+        }
+        return $timeToUse - $this->startedAt->getTimestamp();
     }
 
-    public function getSecondsFromCreateToFinalized()
+    public function getTimeFromCreateToStart($toMinutes = false)
+    {
+        if ($this->state == State::PENDING) {
+            return false;
+        }
+
+        $start = $this->startedAt->getTimestamp();
+        $create = $this->createdAt->getTimestamp();
+
+        if ($toMinutes) {
+            return $this->calculateMinutes($start - $create);
+        }
+
+        return $start - $create;
+    }
+
+    public function getTimeFromCreateToFinalized($toMinutes = false)
     {
         if ($this->state != State::FINALIZED) {
             return false;
         }
-        
-        return $this->updatedAt->getTimestamp() - $this->createdAt->getTimestamp();
+
+        $update = $this->updatedAt->getTimestamp();
+        $create = $this->createdAt->getTimestamp();
+
+        if ($toMinutes) {
+            return $this->calculateMinutes($update - $create);
+        }
+
+        return $update - $create;
+    }
+    
+    public function getTimeFromCreateToNow($toMinutes = false)
+    {
+        $now = (new \DateTime())->getTimestamp();
+        $create = $this->createdAt->getTimestamp();
+
+        if ($toMinutes) {
+            return $this->calculateMinutes($now - $create);
+        }
+
+        return $now - $create;
+    }
+
+    private function calculateMinutes($time) {
+        return number_format($time / 60, 2);
     }
 }
