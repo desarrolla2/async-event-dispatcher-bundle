@@ -73,6 +73,10 @@ class ConsumerCommand extends AbstractCommand
 
     private function checkAndExecuteMessage(Message $message)
     {
+        if (!$this->isStillPending($message)) {
+            return;
+        }
+
         $this->changeMessageState($message, State::EXECUTING);
 
         $eventDispatcher = $this->get('event_dispatcher');
@@ -88,5 +92,14 @@ class ConsumerCommand extends AbstractCommand
     {
         $message->setState($state);
         $this->em->flush();
+    }
+
+    private function isStillPending(Message $message)
+    {
+        if ($message->getState() == State::PENDING) {
+            return true;
+        }
+
+        return false;
     }
 }

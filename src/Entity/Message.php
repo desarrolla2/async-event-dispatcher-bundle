@@ -141,7 +141,7 @@ class Message
         $this->updatedAt = $updatedAt;
     }
 
-    public function getExecutionTime($toMinutes = false)
+    public function getExecutionTime()
     {
         if ($this->state == State::PENDING) {
             return false;
@@ -151,10 +151,10 @@ class Message
         if ($this->state == State::EXECUTING) {
             $timeToUse = (new \DateTime())->getTimestamp();
         }
-        return $timeToUse - $this->startedAt->getTimestamp();
+        return $this->time($timeToUse - $this->startedAt->getTimestamp());
     }
 
-    public function getTimeFromCreateToStart($toMinutes = false)
+    public function getTimeFromCreateToStart()
     {
         if ($this->state == State::PENDING) {
             return false;
@@ -162,15 +162,11 @@ class Message
 
         $start = $this->startedAt->getTimestamp();
         $create = $this->createdAt->getTimestamp();
-
-        if ($toMinutes) {
-            return $this->calculateMinutes($start - $create);
-        }
-
-        return $start - $create;
+        
+        return $this->time($start - $create);
     }
 
-    public function getTimeFromCreateToFinalized($toMinutes = false)
+    public function getTimeFromCreateToFinalized()
     {
         if ($this->state != State::FINALIZED) {
             return false;
@@ -179,26 +175,37 @@ class Message
         $update = $this->updatedAt->getTimestamp();
         $create = $this->createdAt->getTimestamp();
 
-        if ($toMinutes) {
-            return $this->calculateMinutes($update - $create);
-        }
-
-        return $update - $create;
+        return $this->time($update - $create);
     }
     
-    public function getTimeFromCreateToNow($toMinutes = false)
+    public function getTimeFromCreateToNow()
     {
         $now = (new \DateTime())->getTimestamp();
         $create = $this->createdAt->getTimestamp();
 
-        if ($toMinutes) {
-            return $this->calculateMinutes($now - $create);
-        }
-
-        return $now - $create;
+        return $this->time($now - $create);
     }
 
-    private function calculateMinutes($time) {
-        return number_format($time / 60, 2);
+    private function time($time)
+    {
+        if ($time < 90) {
+            return round($time, 2).'s';
+        }
+
+        if ($time < 3600) {
+            $seconds = $time % 60;
+            $minutes = ($time - $seconds) / 60;
+
+            return sprintf('%dm%ss', $minutes, round($seconds, 2));
+        }
+
+        $seconds = $time % 3600;
+        $hours = ($time - $seconds) / 3600;
+
+        $time = $time - $hours * 3600;
+        $seconds = $time % 60;
+        $minutes = ($time - $seconds) / 60;
+
+        return sprintf('%dh %dm %ss', $hours, $minutes, round($seconds, 2));
     }
 }
