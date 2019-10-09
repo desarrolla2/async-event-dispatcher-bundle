@@ -3,3 +3,11 @@ services:
   desarrolla2.async_event_dispatcher:
     class: 'Desarrolla2\AsyncEventDispatcherBundle\EventDispatcher\AsyncEventDispatcher'
     arguments: ['@doctrine.orm.entity_manager']
+
+  desarrolla2_async_event_dispatcher.twig.default_extension:
+    class: 'Desarrolla2\AsyncEventDispatcherBundle\Twig\DefaultExtension'
+    arguments: [ '@doctrine.orm.default_entity_manager']
+    calls:
+      - ['initRuntime', ['@twig']]
+    tags:
+      - { name: 'twig.extension' }

@@ -1,0 +1,43 @@
+<table class="table table-stripped">
+  <thead>
+  <tr>
+    <th>#</th>
+    <th>{{ 'name'|trans|capitalize }}</th>
+    <th>{{ 'created'|trans|capitalize }}</th>
+    <th>{{ 'time to start'|trans|capitalize }}</th>
+    <th>{{ 'execution time'|trans|capitalize }}</th>
+    <th>{{ 'actions'|trans|capitalize }}</th>
+  </tr>
+  </thead>
+  {% for message in messages %}
+    <tr>
+      <td>{{ message.id }}</td>
+      <td>{{ message.name }}</td>
+      <td>{{ message.createdAt|time_ago_in_words }}</td>
+      <td>{{ message.getTimeFromCreateToStart }}</td>
+      <td>{{ message.getExecutionTime }}</td>
+      <td>
+        <div class="btn-group">
+          <button type="button" class="btn btn-xs btn-primary collapsed" data-toggle="collapse"
+                  data-target="#async-event-{{ message.id }}" aria-expanded="false">
+            <i class="fa fa-plus"></i>
+          </button>
+          {% if message.state == constant('Desarrolla2\\AsyncEventDispatcherBundle\\Entity\\State::FINALIZED') %}
+            <a href="{{ path('_async_event.message.reset', {'hash': message.hash, 'referer': app.request.pathinfo}) }}"
+               class="btn btn-xs btn-warning app-confirm">
+              <i class="fa fa-refresh"></i>
+            </a>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+    <tr id="async-event-{{ message.id }}" class="collapse"
+        style="background: #0c4d5d; color: #fff;  overflow: auto;">
+      <td colspan="6">
+        {% for key,data in message.data %}
+          <p style="margin: 0"><strong>{{ key }} </strong>: {{ data|async_event_var_dump }}</p>
+        {% endfor %}
+      </td>
+    </tr>
+  {% endfor %}
+</table>

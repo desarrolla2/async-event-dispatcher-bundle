@@ -30,6 +30,11 @@ class Message
     /**
      * @ORM\Column(type="string")
      */
+    private $hash;
+
+    /**
+     * @ORM\Column(type="string")
+     */
     private $name;
 
     /**
@@ -43,14 +48,19 @@ class Message
     private $state;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
-    private $createdAt;
+    private $startedAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $startedAt;
+    private $finishedAt;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -62,6 +72,7 @@ class Message
      */
     public function __construct()
     {
+        $this->hash = hash('sha256', uniqid(get_called_class(), true));
         $this->createdAt = new DateTime();
         $this->state = State::PENDING;
     }
@@ -76,6 +87,25 @@ class Message
         return $this->data;
     }
 
+    public function getExecutionTime()
+    {
+        if ($this->state == State::PENDING) {
+            return false;
+        }
+
+        $timeToUse = $this->updatedAt->getTimestamp();
+        if ($this->state == State::EXECUTING) {
+            $timeToUse = (new \DateTime())->getTimestamp();
+        }
+
+        return $this->time($timeToUse - $this->startedAt->getTimestamp());
+    }
+
+    public function getHash(): string
+    {
+        return $this->hash;
+    }
+
     public function getId()
     {
         return $this->id;
@@ -86,14 +116,46 @@ class Message
         return $this->name;
     }
 
+    public function getStartedAt(): ?DateTime
+    {
+        return $this->startedAt;
+    }
+
     public function getState(): string
     {
         return $this->state;
     }
 
-    public function getStartedAt(): ?DateTime
+    public function getTimeFromCreateToFinalized()
     {
-        return $this->startedAt;
+        if ($this->state != State::FINALIZED) {
+            return false;
+        }
+
+        $update = $this->updatedAt->getTimestamp();
+        $create = $this->createdAt->getTimestamp();
+
+        return $this->time($update - $create);
+    }
+
+    public function getTimeFromCreateToNow()
+    {
+        $now = (new \DateTime())->getTimestamp();
+        $create = $this->createdAt->getTimestamp();
+
+        return $this->time($now - $create);
+    }
+
+    public function getTimeFromCreateToStart()
+    {
+        if ($this->state == State::PENDING) {
+            return false;
+        }
+
+        $start = $this->startedAt->getTimestamp();
+        $create = $this->createdAt->getTimestamp();
+
+        return $this->time($start - $create);
     }
 
     public function getUpdatedAt(): ?DateTime
@@ -111,6 +173,11 @@ class Message
         $this->data = $data;
     }
 
+    public function setHash($hash): void
+    {
+        $this->hash = (string) $hash;
+    }
+
     public function setId($id): void
     {
         $this->id = $id;
@@ -119,6 +186,11 @@ class Message
     public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    public function setStartedAt($startedAt): void
+    {
+        $this->startedAt = $startedAt;
     }
 
     public function setState($state): void
@@ -131,59 +203,9 @@ class Message
         }
     }
 
-    public function setStartedAt($startedAt): void
-    {
-        $this->startedAt = $startedAt;
-    }
-
     public function setUpdatedAt($updatedAt): void
     {
         $this->updatedAt = $updatedAt;
-    }
-
-    public function getExecutionTime()
-    {
-        if ($this->state == State::PENDING) {
-            return false;
-        }
-
-        $timeToUse = $this->updatedAt->getTimestamp();
-        if ($this->state == State::EXECUTING) {
-            $timeToUse = (new \DateTime())->getTimestamp();
-        }
-        return $this->time($timeToUse - $this->startedAt->getTimestamp());
-    }
-
-    public function getTimeFromCreateToStart()
-    {
-        if ($this->state == State::PENDING) {
-            return false;
-        }
-
-        $start = $this->startedAt->getTimestamp();
-        $create = $this->createdAt->getTimestamp();
-        
-        return $this->time($start - $create);
-    }
-
-    public function getTimeFromCreateToFinalized()
-    {
-        if ($this->state != State::FINALIZED) {
-            return false;
-        }
-
-        $update = $this->updatedAt->getTimestamp();
-        $create = $this->createdAt->getTimestamp();
-
-        return $this->time($update - $create);
-    }
-    
-    public function getTimeFromCreateToNow()
-    {
-        $now = (new \DateTime())->getTimestamp();
-        $create = $this->createdAt->getTimestamp();
-
-        return $this->time($now - $create);
     }
 
     private function time($time)
