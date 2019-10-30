@@ -11,6 +11,7 @@
 
 namespace Desarrolla2\AsyncEventDispatcherBundle\Entity\Repository;
 
+use Desarrolla2\AsyncEventDispatcherBundle\Entity\Message;
 use Doctrine\ORM\EntityRepository;
 
 /**
@@ -21,4 +22,20 @@ use Doctrine\ORM\EntityRepository;
  */
 class MessageRepository extends EntityRepository
 {
+    public function findInDataByFieldAndValue(string $field, $value, int $limit = null): array
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder
+            ->select('message')
+            ->from(Message::class, 'message')
+            ->where('message.data LIKE :data')
+            ->setParameter('data', sprintf('%%"%s": %s%%', $field, $value))
+            ->addOrderBy('message.createdAt', 'DESC');
+
+        if ($limit) {
+            $queryBuilder->setMaxResults($limit);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 }
