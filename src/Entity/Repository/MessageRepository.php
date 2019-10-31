@@ -22,13 +22,15 @@ use Doctrine\ORM\EntityRepository;
  */
 class MessageRepository extends EntityRepository
 {
-    public function findInDataByFieldAndValue(string $field, $value, int $limit = null): array
+    public function findInDataByNameFieldAndValue(string $name, string $field, $value, int $limit = null): array
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder
             ->select('message')
             ->from(Message::class, 'message')
-            ->where('message.data LIKE :data')
+            ->where('message.name = :name')
+            ->andWhere('message.data LIKE :data')
+            ->setParameter('name', $name)
             ->setParameter('data', sprintf('%%"%s": %s%%', $field, $value))
             ->addOrderBy('message.createdAt', 'DESC');
 
