@@ -12,6 +12,7 @@
 namespace Desarrolla2\AsyncEventDispatcherBundle\EventDispatcher;
 
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\Message;
+use Desarrolla2\AsyncEventDispatcherBundle\Entity\State;
 use Desarrolla2\AsyncEventDispatcherBundle\Event\Event;
 use Doctrine\ORM\EntityManager;
 
@@ -36,16 +37,16 @@ class AsyncEventDispatcher
         $this->entityManager->flush();
     }
 
-    public function dispatchUnlessIssued($eventName, Event $event = null, array $states = [], array $search = [])
+    public function dispatchUnlessThatExist($eventName, Event $event = null, array $search = [])
     {
-        if ($this->getMessageByNameDataAndState($eventName, $search, $states)) {
+        if ($this->getMessageByNameDataAndState($eventName, $search, [State::PENDING, State::EXECUTING])) {
             return;
         }
 
         $this->dispatch($eventName, $event);
     }
 
-    public function getMessageByNameDataAndState($eventName, array $search, array $states): ?Message
+    protected function getMessageByNameDataAndState($eventName, array $search, array $states): ?Message
     {
         $repository = $this->entityManager->getRepository(Message::class);
         $messages = $repository->findByEventNameSearchAndStates($eventName, $search, $states, 1);
