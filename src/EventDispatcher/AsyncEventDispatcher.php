@@ -35,4 +35,21 @@ class AsyncEventDispatcher
         $this->entityManager->persist($message);
         $this->entityManager->flush();
     }
+
+    public function dispatchUnlessIssued($eventName, Event $event = null, array $states = [], array $search = [])
+    {
+        if ($this->getMessageByNameDataAndState($eventName, $search, $states)) {
+            return;
+        }
+
+        $this->dispatch($eventName, $event);
+    }
+
+    public function getMessageByNameDataAndState($eventName, array $search, array $states): ?Message
+    {
+        $repository = $this->entityManager->getRepository(Message::class);
+        $messages = $repository->findByEventNameSearchAndStates($eventName, $search, $states, 1);
+
+        return count($messages) ? array_values($messages)[0] : null;
+    }
 }
