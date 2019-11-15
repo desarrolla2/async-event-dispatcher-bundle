@@ -47,6 +47,10 @@ class MessageRepository extends EntityRepository
         $count = 0;
         $andX = $expr->andX();
         foreach ($search as $field => $value) {
+            if (is_array($value)){
+                $value = json_encode($value);
+            }
+
             $andX->add('message.data LIKE :data'.$count);
             $queryBuilder->setParameter('data'.$count, sprintf('%%"%s": %s%%', $field, $value));
             $count++;
