@@ -16,13 +16,11 @@
 namespace Desarrolla2\AsyncEventDispatcherBundle\Controller;
 
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\Message;
-use Desarrolla2\AsyncEventDispatcherBundle\Entity\State;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @Route("/async_event/message", name="_async_event.")
@@ -35,10 +33,6 @@ class MessageController extends Controller
      */
     public function resetAction(Request $request, Message $message)
     {
-        if (State::PENDING == $message->getState()) {
-            throw  new NotFoundHttpException();
-        }
-
         $em = $this->getDoctrine()->getManager();
         $newMessage = new Message();
         $newMessage->setName($message->getName());
