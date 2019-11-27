@@ -48,6 +48,7 @@ class DefaultExtension extends Twig_Extension
     public function getFunctions(): array
     {
         return [
+            new Twig_SimpleFunction('async_event_message_is_finalized', [$this, 'isFinalized']),
             new Twig_SimpleFunction('async_event_count_pending', [$this, 'countPending']),
             new Twig_SimpleFunction(
                 'async_event_render_pending',
@@ -68,6 +69,11 @@ class DefaultExtension extends Twig_Extension
         ];
     }
 
+    public function isFinalized(Message $message): bool
+    {
+        return $message->getState() == State::FINALIZED;
+    }
+
     public function renderLatest(Environment $twig): string
     {
         return $twig->render('@AsyncEventDispatcher/table.html.twig', ['messages' => $this->getLatestMessages()]);
@@ -85,7 +91,7 @@ class DefaultExtension extends Twig_Extension
 
     private function getLatestMessages(): array
     {
-        return $messages = $this->em->getRepository(Message::class)->findBy(
+        return $this->em->getRepository(Message::class)->findBy(
             ['state' => [State::FINALIZED]],
             ['updatedAt' => 'DESC'],
             10
@@ -94,7 +100,7 @@ class DefaultExtension extends Twig_Extension
 
     private function getPendingMessages(): array
     {
-        return $messages = $this->em->getRepository(Message::class)->findBy(
+        return $this->em->getRepository(Message::class)->findBy(
             ['state' => [State::PENDING, State::EXECUTING]],
             ['updatedAt' => 'DESC'],
             10

@@ -22,12 +22,10 @@
                   data-target="#async-event-{{ message.id }}" aria-expanded="false">
             <i class="fa fa-plus"></i>
           </button>
-          {% if message.state == constant('Desarrolla2\\AsyncEventDispatcherBundle\\Entity\\State::FINALIZED') %}
-            <a href="{{ path('_async_event.message.reset', {'hash': message.hash, 'referer': app.request.pathinfo}) }}"
-               class="btn btn-xs btn-warning app-confirm">
-              <i class="fa fa-refresh"></i>
-            </a>
-          {% endif %}
+          <a href="{{ path('_async_event.message.reset', {'hash': message.hash, 'referer': app.request.pathinfo}) }}"
+             class="btn btn-xs btn-warning app-confirm">
+            <i class="fa fa-refresh"></i>
+          </a>
         </div>
       </td>
     </tr>
