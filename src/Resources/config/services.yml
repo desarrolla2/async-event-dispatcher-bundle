@@ -1,12 +1,18 @@
 services:
 
+  desarrolla2_async_event_dispatcher.manager.message_manager:
+    class: 'Desarrolla2\AsyncEventDispatcherBundle\Manager\MessageManager'
+    arguments: ['@doctrine.orm.default_entity_manager']
+
   desarrolla2.async_event_dispatcher:
     class: 'Desarrolla2\AsyncEventDispatcherBundle\EventDispatcher\AsyncEventDispatcher'
-    arguments: ['@doctrine.orm.entity_manager']
+    arguments: ['@desarrolla2_async_event_dispatcher.manager.message_manager']
 
   desarrolla2_async_event_dispatcher.twig.default_extension:
     class: 'Desarrolla2\AsyncEventDispatcherBundle\Twig\DefaultExtension'
-    arguments: [ '@doctrine.orm.default_entity_manager']
+    arguments:
+      - '@desarrolla2_async_event_dispatcher.manager.message_manager'
+      - '@doctrine.orm.default_entity_manager'
     calls:
       - ['initRuntime', ['@twig']]
     tags:

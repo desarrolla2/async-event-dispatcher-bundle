@@ -14,27 +14,25 @@ namespace Desarrolla2\AsyncEventDispatcherBundle\EventDispatcher;
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\Message;
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\State;
 use Desarrolla2\AsyncEventDispatcherBundle\Event\Event;
-use Doctrine\ORM\EntityManager;
+use Desarrolla2\AsyncEventDispatcherBundle\Manager\MessageManager;
 
 class AsyncEventDispatcher
 {
-    private $entityManager;
+    private $manager;
 
-    public function __construct(EntityManager $entityManager)
+    public function __construct(MessageManager $manager)
     {
-        $this->entityManager = $entityManager;
+        $this->manager = $manager;
     }
 
     public function dispatch($eventName, Event $event = null)
     {
-        $message = new Message();
-        $message->setName($eventName);
+        $data = [];
         if ($event) {
-            $message->setData($event->getData());
+            $data = $event->getData();
         }
 
-        $this->entityManager->persist($message);
-        $this->entityManager->flush();
+        $message = $this->manager->create($eventName, $data);
     }
 
     public function dispatchUnlessThatExist($eventName, Event $event = null, array $search = [])
@@ -48,7 +46,7 @@ class AsyncEventDispatcher
 
     protected function getMessageByNameDataAndState($eventName, array $search, array $states): ?Message
     {
-        $repository = $this->entityManager->getRepository(Message::class);
+        $repository = $this->manager->getRepository(Message::class);
         $messages = $repository->findByEventNameSearchAndStates($eventName, $search, $states, 1);
 
         return count($messages) ? array_values($messages)[0] : null;

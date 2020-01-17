@@ -11,16 +11,13 @@
 
 namespace Desarrolla2\AsyncEventDispatcherBundle\Command;
 
-use DateTime;
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\Message;
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\State;
 use Desarrolla2\AsyncEventDispatcherBundle\Event\Event;
-use Desarrolla2\Timer\Formatter\Human;
 use Desarrolla2\Timer\Timer;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -58,26 +55,31 @@ class ConsumerCommand extends AbstractCommand
     {
         $messages = $this->em->getRepository(Message::class)->findBy(
             [
-                'state' => State::PENDING
+                'state' => State::PENDING,
             ],
             [
-                'createdAt' => 'ASC'
+                'createdAt' => 'ASC',
             ],
             $this->getParameter('async_event_dispatcher.num_messages_per_execution')
         );
 
         foreach ($messages as $message) {
-            $this->checkAndExecuteMessage($message);
+            $this->executeMessage($message, $output);
         }
     }
 
-    private function checkAndExecuteMessage(Message $message)
+    private function executeMessage(Message $message, OutputInterface $output): void
     {
-        if (!$this->isStillPending($message)) {
+        if (!$this->isReady($message)) {
             return;
         }
 
-        $this->changeMessageState($message, State::EXECUTING);
+        $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
+
+        $manager->update($message, State::EXECUTING);
+        $output->writeln(
+            sprintf(' - executing "%s" with "%s" data', $message->getName(), $this->getSizeOf($message->getData()))
+        );
 
         $eventDispatcher = $this->get('event_dispatcher');
         $eventDispatcher->dispatch(
@@ -85,21 +87,19 @@ class ConsumerCommand extends AbstractCommand
             new Event($message->getData())
         );
 
-        $this->changeMessageState($message, State::FINALIZED);
+        $manager->update($message, State::FINISH);
     }
 
-    private function changeMessageState(Message $message, string $state)
+    private function getSizeOf(array $data): string
     {
-        $message->setState($state);
-        $this->em->flush();
-    }
-
-    private function isStillPending(Message $message)
-    {
-        if ($message->getState() == State::PENDING) {
-            return true;
+        $size = strlen(json_encode($data));
+        if ($size < 1000) {
+            return sprintf('%dB', $size);
+        }
+        if ($size < 1000 ^ 2) {
+            return sprintf('%dKB', round($size / 1000));
         }
 
-        return false;
+        return sprintf('%dMB', round($size / 1000 / 1000));
     }
 }

@@ -17,6 +17,7 @@ namespace Desarrolla2\AsyncEventDispatcherBundle\Twig;
 
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\Message;
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\State;
+use Desarrolla2\AsyncEventDispatcherBundle\Manager\MessageManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Twig\Environment;
 use Twig_Extension;
@@ -24,11 +25,43 @@ use Twig_SimpleFunction;
 
 class DefaultExtension extends Twig_Extension
 {
+    protected $manager;
     protected $em;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(MessageManager $manager, EntityManagerInterface $entityManager)
     {
+        $this->manager = $manager;
         $this->em = $entityManager;
+    }
+
+    public function canBePaused(Message $message): bool
+    {
+        if ($this->manager->isReady($message)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canBePlayed(Message $message): bool
+    {
+        if ($this->manager->isPaused($message)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canBeRemoved(Message $message): bool
+    {
+        if ($this->manager->isReady($message) || $this->manager->isPaused($message)) {
+            return true;
+        }
+        if ($this->manager->isFinish($message)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function countPending(): int
@@ -48,7 +81,9 @@ class DefaultExtension extends Twig_Extension
     public function getFunctions(): array
     {
         return [
-            new Twig_SimpleFunction('async_event_message_is_finalized', [$this, 'isFinalized']),
+            new Twig_SimpleFunction('async_event_message_can_be_removed', [$this, 'canBeRemoved']),
+            new Twig_SimpleFunction('async_event_message_can_be_played', [$this, 'canBePlayed']),
+            new Twig_SimpleFunction('async_event_message_can_be_paused', [$this, 'canBePaused']),
             new Twig_SimpleFunction('async_event_count_pending', [$this, 'countPending']),
             new Twig_SimpleFunction(
                 'async_event_render_pending',
@@ -69,11 +104,6 @@ class DefaultExtension extends Twig_Extension
         ];
     }
 
-    public function isFinalized(Message $message): bool
-    {
-        return $message->getState() == State::FINALIZED;
-    }
-
     public function renderLatest(Environment $twig): string
     {
         return $twig->render('@AsyncEventDispatcher/table.html.twig', ['messages' => $this->getLatestMessages()]);
@@ -92,7 +122,7 @@ class DefaultExtension extends Twig_Extension
     private function getLatestMessages(): array
     {
         return $this->em->getRepository(Message::class)->findBy(
-            ['state' => [State::FINALIZED]],
+            ['state' => [State::FINISH]],
             ['updatedAt' => 'DESC'],
             10
         );
@@ -101,8 +131,8 @@ class DefaultExtension extends Twig_Extension
     private function getPendingMessages(): array
     {
         return $this->em->getRepository(Message::class)->findBy(
-            ['state' => [State::PENDING, State::EXECUTING]],
-            ['updatedAt' => 'DESC'],
+            ['state' => [State::PENDING, State::PAUSED, State::EXECUTING]],
+            ['createdAt' => 'ASC'],
             10
         );
     }

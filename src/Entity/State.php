@@ -11,12 +11,10 @@
 
 namespace Desarrolla2\AsyncEventDispatcherBundle\Entity;
 
-use DateTime;
-use Doctrine\ORM\Mapping as ORM;
-
 class State
 {
-    const PENDING = 'PENDING';
     const EXECUTING = 'EXECUTING';
-    const FINALIZED = 'FINALIZED';
+    const FINISH = 'FINISH';
+    const PAUSED = 'PAUSED';
+    const PENDING = 'PENDING';
 }

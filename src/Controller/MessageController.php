@@ -16,6 +16,7 @@
 namespace Desarrolla2\AsyncEventDispatcherBundle\Controller;
 
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\Message;
+use Desarrolla2\AsyncEventDispatcherBundle\Entity\State;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -27,6 +28,60 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class MessageController extends Controller
 {
+    /**
+     * @Route("/{hash}/pause", name="message.pause", requirements={"hash"="\w{64}"})
+     * @Method({"GET"})
+     */
+    public function pauseAction(Request $request, Message $message)
+    {
+        $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
+        if ($manager->isReady($message)) {
+            $manager->update($message, State::PAUSED);
+            $this->addFlash('success', 'message paused');
+
+            return new RedirectResponse($request->get('referer'));
+        }
+        $this->addFlash('danger', 'message cannot be paused');
+
+        return new RedirectResponse($request->get('referer'));
+    }
+
+    /**
+     * @Route("/{hash}/play", name="message.play", requirements={"hash"="\w{64}"})
+     * @Method({"GET"})
+     */
+    public function playAction(Request $request, Message $message)
+    {
+        $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
+        if ($manager->isPaused($message)) {
+            $manager->update($message, State::PENDING);
+            $this->addFlash('success', 'message played');
+
+            return new RedirectResponse($request->get('referer'));
+        }
+        $this->addFlash('danger', 'message cannot be played');
+
+        return new RedirectResponse($request->get('referer'));
+    }
+
+    /**
+     * @Route("/{hash}/remove", name="message.remove", requirements={"hash"="\w{64}"})
+     * @Method({"GET"})
+     */
+    public function removeAction(Request $request, Message $message)
+    {
+        $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
+        if ($manager->isReady($message) || $manager->isPaused($message) || $manager->isFinish($message)) {
+            $manager->remove($message);
+            $this->addFlash('success', 'message removed');
+
+            return new RedirectResponse($request->get('referer'));
+        }
+        $this->addFlash('danger', 'message cannot be removed');
+
+        return new RedirectResponse($request->get('referer'));
+    }
+
     /**
      * @Route("/{hash}/reset", name="message.reset", requirements={"hash"="\w{64}"})
      * @Method({"GET"})

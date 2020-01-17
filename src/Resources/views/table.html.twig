@@ -14,18 +14,36 @@
       <td>{{ message.id }}</td>
       <td>{{ message.name }}</td>
       <td>{{ message.createdAt|time_ago_in_words }}</td>
-      <td>{{ message.getTimeFromCreateToStart }}</td>
-      <td>{{ message.getExecutionTime }}</td>
+      <td></td>
+      <td></td>
       <td>
         <div class="btn-group">
           <button type="button" class="btn btn-xs btn-primary collapsed" data-toggle="collapse"
                   data-target="#async-event-{{ message.id }}" aria-expanded="false">
             <i class="fa fa-plus"></i>
           </button>
+          {% if async_event_message_can_be_played(message) %}
+            <a href="{{ path('_async_event.message.play', {'hash': message.hash, 'referer': app.request.pathinfo}) }}"
+               class="btn btn-xs btn-success">
+              <i class="fa fa-play"></i>
+            </a>
+          {% endif %}
+          {% if async_event_message_can_be_paused(message) %}
+            <a href="{{ path('_async_event.message.pause', {'hash': message.hash, 'referer': app.request.pathinfo}) }}"
+               class="btn btn-xs btn-warning">
+              <i class="fa fa-pause"></i>
+            </a>
+          {% endif %}
           <a href="{{ path('_async_event.message.reset', {'hash': message.hash, 'referer': app.request.pathinfo}) }}"
-             class="btn btn-xs btn-warning app-confirm">
+             class="btn btn-xs btn-warning">
             <i class="fa fa-refresh"></i>
           </a>
+          {% if async_event_message_can_be_removed(message) %}
+            <a href="{{ path('_async_event.message.remove', {'hash': message.hash, 'referer': app.request.pathinfo}) }}"
+               class="btn btn-xs btn-danger">
+              <i class="fa fa-trash"></i>
+            </a>
+          {% endif %}
         </div>
       </td>
     </tr>
