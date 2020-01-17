@@ -71,16 +71,45 @@ class DefaultExtension extends Twig_Extension
         );
     }
 
+    public function formatSize(int $size): string
+    {
+        if ($size < 1000) {
+            return sprintf('%dB', $size);
+        }
+        if ($size < 1000 ^ 2) {
+            return sprintf('%dKB', round($size / 1000));
+        }
+
+        return sprintf('%dMB', round($size / 1000 / 1000));
+    }
+
+    public function getExecutionTime(Message $message): string
+    {
+        if (!$message->getStartedAt()) {
+            return '~';
+        }
+        $time = new \DateTime();
+        if ($message->getFinishAt()) {
+            $time = $message->getFinishAt();
+        }
+        $difference = $time->getTimestamp() - $message->getStartedAt()->getTimestamp();
+
+        return $this->formatTime($difference);
+    }
+
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('async_event_var_dump', [$this, 'varDump']),
+            new \Twig_SimpleFilter('async_event_message_json_encode', [$this, 'jsonEncode']),
+            new \Twig_SimpleFilter('async_event_message_format_size', [$this, 'formatSize']),
         ];
     }
 
     public function getFunctions(): array
     {
         return [
+            new Twig_SimpleFunction('async_event_message_get_time_to_start', [$this, 'getTimeToStart']),
+            new Twig_SimpleFunction('async_event_message_get_execution_time', [$this, 'getExecutionTime']),
             new Twig_SimpleFunction('async_event_message_can_be_removed', [$this, 'canBeRemoved']),
             new Twig_SimpleFunction('async_event_message_can_be_played', [$this, 'canBePlayed']),
             new Twig_SimpleFunction('async_event_message_can_be_paused', [$this, 'canBePaused']),
@@ -104,6 +133,21 @@ class DefaultExtension extends Twig_Extension
         ];
     }
 
+    public function getTimeToStart(Message $message): string
+    {
+        if (!$message->getStartedAt()) {
+            return '~';
+        }
+        $difference = $message->getStartedAt()->getTimestamp() - $message->getCreatedAt()->getTimestamp();
+
+        return $this->formatTime($difference);
+    }
+
+    public function jsonEncode($value)
+    {
+        return json_encode($value, JSON_PRETTY_PRINT);
+    }
+
     public function renderLatest(Environment $twig): string
     {
         return $twig->render('@AsyncEventDispatcher/table.html.twig', ['messages' => $this->getLatestMessages()]);
@@ -114,9 +158,30 @@ class DefaultExtension extends Twig_Extension
         return $twig->render('@AsyncEventDispatcher/table.html.twig', ['messages' => $this->getPendingMessages()]);
     }
 
-    public function varDump($value)
+    private function formatTime(int $time): string
     {
-        return json_encode($value, JSON_PRETTY_PRINT);
+        if ($time < 0) {
+            return sprintf('-%s', $this->formatTime(-$time));
+        }
+        if ($time < 90) {
+            return round($time, 2).'s';
+        }
+
+        if ($time < 3600) {
+            $seconds = $time % 60;
+            $minutes = ($time - $seconds) / 60;
+
+            return sprintf('%dm%ss', $minutes, round($seconds, 2));
+        }
+
+        $seconds = $time % 3600;
+        $hours = ($time - $seconds) / 3600;
+
+        $time = $time - $hours * 3600;
+        $seconds = $time % 60;
+        $minutes = ($time - $seconds) / 60;
+
+        return sprintf('%dh %dm %ss', $hours, $minutes, round($seconds, 2));
     }
 
     private function getLatestMessages(): array

@@ -102,6 +102,11 @@ class Message
         return $this->name;
     }
 
+    public function getSize(): int
+    {
+        return $this->size;
+    }
+
     public function getStartedAt(): ?DateTime
     {
         return $this->startedAt;
@@ -145,6 +150,11 @@ class Message
     public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    public function setSize(int $size): void
+    {
+        $this->size = $size;
     }
 
     public function setStartedAt($startedAt): void

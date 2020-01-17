@@ -78,7 +78,7 @@ class ConsumerCommand extends AbstractCommand
 
         $manager->update($message, State::EXECUTING);
         $output->writeln(
-            sprintf(' - executing "%s" with "%s" data', $message->getName(), $this->getSizeOf($message->getData()))
+            sprintf(' - executing "%s" with "%s" data', $message->getName(), $this->formatSize($message->getSize()))
         );
 
         $eventDispatcher = $this->get('event_dispatcher');
@@ -90,9 +90,8 @@ class ConsumerCommand extends AbstractCommand
         $manager->update($message, State::FINISH);
     }
 
-    private function getSizeOf(array $data): string
+    private function formatSize(int $size): string
     {
-        $size = strlen(json_encode($data));
         if ($size < 1000) {
             return sprintf('%dB', $size);
         }
