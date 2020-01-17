@@ -36,7 +36,7 @@
           {% endif %}
           <a href="{{ path('_async_event.message.reset', {'hash': message.hash, 'referer': app.request.pathinfo}) }}"
              class="btn btn-xs btn-warning">
-            <i class="fa fa-refresh"></i>
+            <i class="fa fa-clone"></i>
           </a>
           {% if async_event_message_can_be_removed(message) %}
             <a href="{{ path('_async_event.message.remove', {'hash': message.hash, 'referer': app.request.pathinfo}) }}"
