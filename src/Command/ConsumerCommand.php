@@ -71,7 +71,6 @@ class ConsumerCommand extends AbstractCommand
     private function executeMessage(Message $message, OutputInterface $output): void
     {
         $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
-        
         if (!$manager->isReady($message)) {
             return;
         }
