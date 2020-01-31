@@ -88,23 +88,19 @@ class MessageController extends Controller
      */
     public function resetAction(Request $request, Message $message)
     {
-        $em = $this->getDoctrine()->getManager();
-        $newMessage = new Message();
-        $newMessage->setName($message->getName());
-
-        $data = array_merge(
-            $message->getData(),
-            [
-                'reseted' => true,
-                'user_id' => $this->getUser()->getId(),
-                'original_message_id' => $message->getId(),
-                'original_user_id' => $message->getData()['user_id'],
-            ]
+        $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
+        $newMessage = $manager->create(
+            $message->getName(),
+            array_merge(
+                $message->getData(),
+                [
+                    'reseted' => true,
+                    'user_id' => $this->getUser()->getId(),
+                    'original_message_id' => $message->getId(),
+                    'original_user_id' => $message->getData()['user_id'],
+                ]
+            )
         );
-
-        $newMessage->setData($data);
-        $em->persist($newMessage);
-        $em->flush();
 
         return new RedirectResponse($request->get('referer'));
     }

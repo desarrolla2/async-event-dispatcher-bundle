@@ -25,17 +25,17 @@ class AsyncEventDispatcher
         $this->manager = $manager;
     }
 
-    public function dispatch($eventName, Event $event = null)
+    public function dispatch($eventName, Event $event = null): void
     {
         $data = [];
         if ($event) {
             $data = $event->getData();
         }
 
-        $message = $this->manager->create($eventName, $data);
+        $this->manager->create($eventName, $data);
     }
 
-    public function dispatchUnlessThatExist($eventName, Event $event = null, array $search = [])
+    public function dispatchUnlessThatExist($eventName, Event $event = null, array $search = []): void
     {
         if ($this->getMessageByNameDataAndState($eventName, $search, [State::PENDING, State::EXECUTING])) {
             return;

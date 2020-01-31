@@ -11,7 +11,7 @@
 
 namespace Desarrolla2\AsyncEventDispatcherBundle\Entity;
 
-class State
+abstract class State
 {
     const EXECUTING = 'EXECUTING';
     const FINISH = 'FINISH';

@@ -54,14 +54,7 @@ class DefaultExtension extends Twig_Extension
 
     public function canBeRemoved(Message $message): bool
     {
-        if ($this->manager->isReady($message) || $this->manager->isPaused($message)) {
-            return true;
-        }
-        if ($this->manager->isFinish($message)) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     public function countPending(): int

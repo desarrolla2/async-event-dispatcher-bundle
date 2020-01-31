@@ -35,38 +35,26 @@ class MessageManager
 
     public function isFinish(Message $message): bool
     {
-        if ($message->getState() == State::FINISH) {
-            return true;
-        }
-
-        return false;
+        return State::FINISH === $message->getState();
     }
 
     public function isPaused(Message $message): bool
     {
-        if ($message->getState() == State::PAUSED) {
-            return true;
-        }
-
-        return false;
+        return State::PAUSED === $message->getState();
     }
 
     public function isReady(Message $message): bool
     {
-        if ($message->getState() == State::PENDING) {
-            return true;
-        }
-
-        return false;
+        return State::PENDING === $message->getState();
     }
 
-    public function remove(Message $message)
+    public function remove(Message $message): void
     {
         $this->em->remove($message);
         $this->em->flush();
     }
 
-    public function update(Message $message, string $state)
+    public function update(Message $message, string $state): void
     {
         $message->setState($state);
         $message->setUpdatedAt(new \DateTime());
