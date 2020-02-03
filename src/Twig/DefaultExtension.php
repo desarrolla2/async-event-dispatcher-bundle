@@ -180,7 +180,7 @@ class DefaultExtension extends Twig_Extension
     private function getLatestMessages(): array
     {
         return $this->em->getRepository(Message::class)->findBy(
-            ['state' => [State::FINISH]],
+            ['state' => [State::FINISH, State::FAILED]],
             ['updatedAt' => 'DESC'],
             10
         );

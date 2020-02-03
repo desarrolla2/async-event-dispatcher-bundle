@@ -13,6 +13,7 @@ namespace Desarrolla2\AsyncEventDispatcherBundle\Entity;
 
 abstract class State
 {
+    const FAILED = 'FAILED';
     const EXECUTING = 'EXECUTING';
     const FINISH = 'FINISH';
     const PAUSED = 'PAUSED';

@@ -51,7 +51,10 @@ class ConsumerCommand extends AbstractCommand
         $this->finalize();
     }
 
-    protected function executeSecure(InputInterface $input, OutputInterface $output)
+    /**
+     * @param OutputInterface $output
+     */
+    protected function executePending(OutputInterface $output): void
     {
         $messages = $this->em->getRepository(Message::class)->findBy(
             [
@@ -65,6 +68,39 @@ class ConsumerCommand extends AbstractCommand
 
         foreach ($messages as $message) {
             $this->executeMessage($message, $output);
+        }
+    }
+
+    protected function executeSecure(InputInterface $input, OutputInterface $output)
+    {
+        $this->executePending($output);
+        $this->markAsFailedNotFinalized($output);
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    protected function markAsFailedNotFinalized(OutputInterface $output): void
+    {
+        $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
+        $messages = $this->em->getRepository(Message::class)->findBy(
+            [
+                'state' => State::EXECUTING,
+            ],
+            [
+                'createdAt' => 'ASC',
+            ]
+        );
+        $maxExecutionTime = 30 * 60;
+        foreach ($messages as $message) {
+            if (!$message->getStartedAt()) {
+                continue;
+            }
+            $difference = (new \DateTime())->getTimestamp() - $message->getStartedAt()->getTimestamp();
+            if ($difference < $maxExecutionTime) {
+                continue;
+            }
+            $manager->update($message, State::FAILED);
         }
     }
 

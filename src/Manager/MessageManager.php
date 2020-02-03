@@ -64,6 +64,9 @@ class MessageManager
         if ($state === State::FINISH) {
             $message->setFinishAt(new \DateTime());
         }
+        if ($state === State::FAILED) {
+            $message->setFinishAt(new \DateTime());
+        }
         $this->em->flush();
     }
 }
