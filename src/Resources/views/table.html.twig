@@ -1,23 +1,23 @@
 <table class="table table-stripped">
   <thead>
   <tr>
-    <th>#</th>
+    <th class="text-right">#</th>
     <th>{{ 'name'|trans|capitalize }}</th>
-    <th class="col-sm-1 ">{{ 'size'|trans|capitalize }}</th>
-    <th class="col-sm-2">{{ 'created'|trans|capitalize }}</th>
-    <th class="col-sm-1">{{ 'time to start'|trans|capitalize }}</th>
-    <th class="col-sm-1">{{ 'execution time'|trans|capitalize }}</th>
+    <th class="col-sm-1 text-right">{{ 'size'|trans|capitalize }}</th>
+    <th class="col-sm-2 text-right">{{ 'created'|trans|capitalize }}</th>
+    <th class="col-sm-1 text-right">{{ 'time to start'|trans|capitalize }}</th>
+    <th class="col-sm-1 text-right">{{ 'execution time'|trans|capitalize }}</th>
     <th class="col-sm-2 text-right">{{ 'actions'|trans|capitalize }}</th>
   </tr>
   </thead>
   {% for message in messages %}
     <tr>
-      <td>{{ message.id }}</td>
+      <td class="text-right">{{ message.id }}</td>
       <td>{{ message.name }}</td>
-      <td>{{ message.size|async_event_message_format_size }}</td>
-      <td>{{ message.createdAt|time_ago_in_words }}</td>
-      <td>{{ async_event_message_get_time_to_start(message) }}</td>
-      <td>{{ async_event_message_get_execution_time(message) }}</td>
+      <td class="text-right">{{ message.size|async_event_message_format_size }}</td>
+      <td class="text-right">{{ message.createdAt|time_ago_in_words }}</td>
+      <td class="text-right">{{ async_event_message_get_time_to_start(message) }}</td>
+      <td class="text-right">{{ async_event_message_get_execution_time(message) }}</td>
       <td class="text-right">
         <div class="btn-group">
           <button type="button" class="btn btn-xs btn-primary collapsed" data-toggle="collapse"
