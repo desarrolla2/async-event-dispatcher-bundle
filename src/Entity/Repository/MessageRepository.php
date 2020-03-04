@@ -51,8 +51,12 @@ class MessageRepository extends EntityRepository
                 $value = json_encode($value);
             }
 
+            $textSearch = sprintf('"%s": %s', $field, $value);
+            if(is_string($value)){
+                $textSearch = sprintf('"%s": "%s"', $field, $value);
+            }
             $andX->add('message.data LIKE :data'.$count);
-            $queryBuilder->setParameter('data'.$count, sprintf('%%"%s": %s%%', $field, $value));
+            $queryBuilder->setParameter('data'.$count, '%'.$textSearch.'%');
             $count++;
         }
         $queryBuilder->andWhere($andX);

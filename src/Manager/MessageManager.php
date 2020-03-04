@@ -69,4 +69,12 @@ class MessageManager
         }
         $this->em->flush();
     }
+
+    public function getLastMessageByEventNameSearchAndStates(string $eventName, array $search, array $states):?Message
+    {
+        $repository = $this->em->getRepository(Message::class);
+        $messages = $repository->findByEventNameSearchAndStates($eventName, $search, $states, 1);
+
+        return count($messages) ? array_values($messages)[0] : null;
+    }
 }

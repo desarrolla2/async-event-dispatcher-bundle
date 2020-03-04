@@ -35,20 +35,14 @@ class AsyncEventDispatcher
         $this->manager->create($eventName, $data);
     }
 
-    public function dispatchUnlessThatExist($eventName, Event $event = null, array $search = []): void
+    public function dispatchUnlessThatExist(string $eventName, Event $event = null, array $search = [], array $states = [State::PENDING]): void
     {
-        if ($this->getMessageByNameDataAndState($eventName, $search, [State::PENDING, State::EXECUTING])) {
+        $lastMessage = $this->manager->getLastMessageByEventNameSearchAndStates($eventName, $search, $states);
+        ldd($lastMessage);
+        if ($lastMessage) {
             return;
         }
 
         $this->dispatch($eventName, $event);
-    }
-
-    protected function getMessageByNameDataAndState($eventName, array $search, array $states): ?Message
-    {
-        $repository = $this->manager->getRepository(Message::class);
-        $messages = $repository->findByEventNameSearchAndStates($eventName, $search, $states, 1);
-
-        return count($messages) ? array_values($messages)[0] : null;
     }
 }
