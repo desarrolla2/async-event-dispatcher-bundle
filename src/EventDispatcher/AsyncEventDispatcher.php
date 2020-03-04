@@ -38,7 +38,6 @@ class AsyncEventDispatcher
     public function dispatchUnlessThatExist(string $eventName, Event $event = null, array $search = [], array $states = [State::PENDING]): void
     {
         $lastMessage = $this->manager->getLastMessageByEventNameSearchAndStates($eventName, $search, $states);
-        ldd($lastMessage);
         if ($lastMessage) {
             return;
         }
