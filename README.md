@@ -51,6 +51,7 @@ You need put something like this in your config.yml
 ```yaml
 async_event_dispatcher:
   num_messages_per_execution: 1
+  maximum_num_of_consumers: 4
 ```
     
 ## Create your first message asynchronous    

@@ -43,6 +43,9 @@ class ConsumerCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
+            if ($this->isMaximumNumberOfConsumersAreBeingUsed()) {
+                $this->finalize();
+            }
             $this->executeSecure($input, $output);
         } catch (Exception $exception) {
             $this->notifyError($exception);
@@ -104,6 +107,13 @@ class ConsumerCommand extends AbstractCommand
         }
     }
 
+    private function countMessagesExecuting(): int
+    {
+        $repository = $this->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Message::class);
+
+        return $repository->count(['state' => State::EXECUTING]);
+    }
+
     private function executeMessage(Message $message, OutputInterface $output): void
     {
         $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
@@ -135,5 +145,15 @@ class ConsumerCommand extends AbstractCommand
         }
 
         return sprintf('%dMB', round($size / 1000 / 1000));
+    }
+
+    private function getMaximumConsumersPermitted(): int
+    {
+        return $this->getContainer()->getParameter('async_event_dispatcher.maximum_num_of_consumers');
+    }
+
+    private function isMaximumNumberOfConsumersAreBeingUsed(): bool
+    {
+        return $this->countMessagesExecuting() >= $this->getMaximumConsumersPermitted();
     }
 }

@@ -32,6 +32,7 @@ class AsyncEventDispatcherExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('async_event_dispatcher.num_messages_per_execution', $config['num_messages_per_execution']);
+        $container->setParameter('async_event_dispatcher.maximum_num_of_consumers', $config['maximum_num_of_consumers']);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');

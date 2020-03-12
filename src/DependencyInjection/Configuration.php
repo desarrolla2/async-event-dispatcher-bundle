@@ -31,7 +31,8 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('num_messages_per_execution')->defaultValue(1)->end()
+                ->integerNode('num_messages_per_execution')->defaultValue(1)->end()
+                ->integerNode('maximum_num_of_consumers')->defaultValue(4)->end()
             ->end();
 
         return $treeBuilder;
