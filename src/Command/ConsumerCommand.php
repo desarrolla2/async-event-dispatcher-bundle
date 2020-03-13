@@ -43,9 +43,6 @@ class ConsumerCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            if ($this->isMaximumNumberOfConsumersAreBeingUsed()) {
-                $this->finalize();
-            }
             $this->executeSecure($input, $output);
         } catch (Exception $exception) {
             $this->notifyError($exception);
@@ -76,6 +73,12 @@ class ConsumerCommand extends AbstractCommand
 
     protected function executeSecure(InputInterface $input, OutputInterface $output)
     {
+        $executing = $this->countMessagesExecuting();
+        if ($executing >= $this->getMaximumConsumersPermitted()) {
+            $output->writeln(
+                sprintf(' - already "%s" proccess in executing. waiting for available slot.')
+            );
+        }
         $this->executePending($output);
         $this->markAsFailedNotFinalized($output);
     }
@@ -150,10 +153,5 @@ class ConsumerCommand extends AbstractCommand
     private function getMaximumConsumersPermitted(): int
     {
         return $this->getContainer()->getParameter('async_event_dispatcher.maximum_num_of_consumers');
-    }
-
-    private function isMaximumNumberOfConsumersAreBeingUsed(): bool
-    {
-        return $this->countMessagesExecuting() >= $this->getMaximumConsumersPermitted();
     }
 }
