@@ -76,7 +76,7 @@ class ConsumerCommand extends AbstractCommand
         $executing = $this->countMessagesExecuting();
         if ($executing >= $this->getMaximumConsumersPermitted()) {
             $output->writeln(
-                sprintf(' - already "%s" proccess in executing. waiting for available slot.')
+                sprintf(' - already "%d" proccess in executing. waiting for available slot.', $executing)
             );
         }
         $this->executePending($output);
