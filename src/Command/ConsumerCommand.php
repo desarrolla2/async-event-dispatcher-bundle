@@ -78,8 +78,10 @@ class ConsumerCommand extends AbstractCommand
             $output->writeln(
                 sprintf(' - already "%d" proccess in executing. waiting for available slot.', $executing)
             );
+        } else {
+            $this->executePending($output);
         }
-        $this->executePending($output);
+
         $this->markAsFailedNotFinalized($output);
     }
 
