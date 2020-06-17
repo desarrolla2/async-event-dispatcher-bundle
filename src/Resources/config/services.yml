@@ -13,7 +13,5 @@ services:
     arguments:
       - '@desarrolla2_async_event_dispatcher.manager.message_manager'
       - '@doctrine.orm.default_entity_manager'
-    calls:
-      - ['initRuntime', ['@twig']]
     tags:
       - { name: 'twig.extension' }
