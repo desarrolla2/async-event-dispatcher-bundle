@@ -129,6 +129,7 @@ class Message
 
     public function setData(array $data): void
     {
+        ksort($data);
         $this->data = $data;
     }
 

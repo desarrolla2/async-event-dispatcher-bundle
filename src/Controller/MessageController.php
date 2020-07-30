@@ -41,7 +41,7 @@ class MessageController extends Controller
 
             return new RedirectResponse($request->get('referer'));
         }
-        $this->addFlash('danger', 'message cannot be paused');
+        $this->addFlash('error', 'message cannot be paused');
 
         return new RedirectResponse($request->get('referer'));
     }
@@ -59,7 +59,7 @@ class MessageController extends Controller
 
             return new RedirectResponse($request->get('referer'));
         }
-        $this->addFlash('danger', 'message cannot be played');
+        $this->addFlash('error', 'message cannot be played');
 
         return new RedirectResponse($request->get('referer'));
     }
@@ -77,7 +77,7 @@ class MessageController extends Controller
 
             return new RedirectResponse($request->get('referer'));
         }
-        $this->addFlash('danger', 'message cannot be removed');
+        $this->addFlash('error', 'message cannot be removed');
 
         return new RedirectResponse($request->get('referer'));
     }
