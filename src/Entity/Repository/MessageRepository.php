@@ -47,12 +47,12 @@ class MessageRepository extends EntityRepository
         $count = 0;
         $andX = $expr->andX();
         foreach ($search as $field => $value) {
-            if (is_array($value)){
+            if (is_array($value)) {
                 $value = json_encode($value);
             }
 
             $textSearch = sprintf('"%s": %s', $field, $value);
-            if(is_string($value)){
+            if (is_string($value)) {
                 $textSearch = sprintf('"%s": "%s"', $field, $value);
             }
             $andX->add('message.data LIKE :data'.$count);
@@ -85,6 +85,25 @@ class MessageRepository extends EntityRepository
             ->setParameter('state', $state)
             ->setParameter('name', $name)
             ->setParameter('data', sprintf('%%"%s": %s%%', $field, $value))
+            ->addOrderBy('message.createdAt', 'DESC');
+
+        if ($limit) {
+            $queryBuilder->setMaxResults($limit);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getPendingMessages(int $limit = 0): array
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder
+            ->select('message')
+            ->from(Message::class, 'message')
+            ->where('message.state = :pending')
+            ->andWhere('message.startAfter IS NULL or message.startAfter <= :now')
+            ->setParameter('pending', State::PENDING)
+            ->setParameter('now', new \DateTime())
             ->addOrderBy('message.createdAt', 'DESC');
 
         if ($limit) {

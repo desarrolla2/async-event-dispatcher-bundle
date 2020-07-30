@@ -25,7 +25,7 @@ class AsyncEventDispatcher
         $this->manager = $manager;
     }
 
-    public function dispatch($eventName, Event $event = null): void
+    public function dispatch($eventName, Event $event = null, \DateTime $startAfter = null): void
     {
         $data = [];
         if ($event) {
@@ -33,7 +33,7 @@ class AsyncEventDispatcher
         }
         $data = array_merge([Key::NUMBER_OF_SLOTS => 1], $data);
 
-        $this->manager->create($eventName, $data);
+        $this->manager->create($eventName, $data, $startAfter);
     }
 
     public function dispatchUnlessThatExist(

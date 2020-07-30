@@ -190,7 +190,7 @@ class DefaultExtension extends Twig_Extension
     {
         return $this->em->getRepository(Message::class)->findBy(
             ['state' => [State::PENDING, State::PAUSED, State::EXECUTING]],
-            ['createdAt' => 'ASC'],
+            ['startAfter' => 'ASC', 'createdAt' => 'ASC'],
             10
         );
     }

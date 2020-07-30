@@ -147,15 +147,11 @@ class ConsumerCommand extends AbstractCommand
 
     private function getPendingMessages()
     {
-        $messages = $this->em->getRepository(Message::class)->findBy(
-            [
-                'state' => State::PENDING,
-            ],
-            [
-                'createdAt' => 'ASC',
-            ],
-            $this->getParameter('async_event_dispatcher.num_messages_per_execution')
-        );
+        return $this->em
+            ->getRepository(Message::class)
+            ->getPendingMessages(
+                $this->getParameter('async_event_dispatcher.num_messages_per_execution')
+            );
 
         return $messages;
     }

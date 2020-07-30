@@ -55,6 +55,11 @@ class Message
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
+    private $startAfter;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
     private $startedAt;
 
     /**
@@ -107,6 +112,11 @@ class Message
         return $this->size;
     }
 
+    public function getStartAfter(): ?\DateTime
+    {
+        return $this->startAfter;
+    }
+
     public function getStartedAt(): ?DateTime
     {
         return $this->startedAt;
@@ -156,6 +166,11 @@ class Message
     public function setSize(int $size): void
     {
         $this->size = $size;
+    }
+
+    public function setStartAfter(\DateTime $startAfter = null): void
+    {
+        $this->startAfter = $startAfter;
     }
 
     public function setStartedAt($startedAt): void
