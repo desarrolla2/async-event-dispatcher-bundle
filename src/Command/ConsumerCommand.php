@@ -78,8 +78,8 @@ class ConsumerCommand extends AbstractCommand
         $messages = $this->getPendingMessages();
         $output->writeln(
             [
-                sprintf(' - "%d" slots available.', $availableSlots,),
-                sprintf(' - "%d" slots in execution.', $executingSlots,),
+                sprintf(' - "%d" slots available.', $availableSlots),
+                sprintf(' - "%d" slots in execution.', $executingSlots),
                 '',
             ]
         );
@@ -87,8 +87,8 @@ class ConsumerCommand extends AbstractCommand
             $messageSlots = $this->getMessageSlots($message);
             $output->writeln(
                 [
-                    sprintf(' - we will try to execute message "%s".', $message->getHash(),),
-                    sprintf(' - need "%d" slots for current message.', $messageSlots,),
+                    sprintf(' - we will try to execute message "%s".', $message->getHash()),
+                    sprintf(' - need "%d" slots for current message.', $messageSlots),
                 ]
             );
             if (($executingSlots + $messageSlots) > $availableSlots) {
@@ -171,7 +171,7 @@ class ConsumerCommand extends AbstractCommand
                 'createdAt' => 'ASC',
             ]
         );
-        $maxExecutionTime = 30 * 60;
+        $maxExecutionTime = 15 * 60;
         foreach ($messages as $message) {
             if (!$message->getStartedAt()) {
                 continue;
@@ -181,6 +181,7 @@ class ConsumerCommand extends AbstractCommand
                 continue;
             }
             $manager->update($message, State::FAILED);
+            $output->writeln(sprintf(' - we mark message "%s" as failed.', $message->getHash()));
         }
     }
 }

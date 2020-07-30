@@ -71,13 +71,8 @@ class MessageController extends Controller
     public function removeAction(Request $request, Message $message)
     {
         $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
-        if ($manager->isReady($message) || $manager->isPaused($message) || $manager->isFinish($message)) {
-            $manager->remove($message);
-            $this->addFlash('success', 'message removed');
-
-            return new RedirectResponse($request->get('referer'));
-        }
-        $this->addFlash('error', 'message cannot be removed');
+        $manager->remove($message);
+        $this->addFlash('success', 'message removed');
 
         return new RedirectResponse($request->get('referer'));
     }
