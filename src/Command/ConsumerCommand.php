@@ -87,7 +87,11 @@ class ConsumerCommand extends AbstractCommand
             $messageSlots = $this->getMessageSlots($message);
             $output->writeln(
                 [
-                    sprintf(' - we will try to execute message "%s".', $message->getHash()),
+                    sprintf(
+                        ' - we will try to execute message [%06d] "%s".',
+                        $message->getId(),
+                        substr($message->getHash(), 0, 6)
+                    ),
                     sprintf(' - need "%d" slots for current message.', $messageSlots),
                 ]
             );
@@ -152,8 +156,6 @@ class ConsumerCommand extends AbstractCommand
             ->getPendingMessages(
                 $this->getParameter('async_event_dispatcher.num_messages_per_execution')
             );
-
-        return $messages;
     }
 
     private function markAsFailedNotFinalized(OutputInterface $output): void
@@ -177,7 +179,13 @@ class ConsumerCommand extends AbstractCommand
                 continue;
             }
             $manager->update($message, State::FAILED);
-            $output->writeln(sprintf(' - we mark message "%s" as failed.', $message->getHash()));
+            $output->writeln(
+                sprintf(
+                    ' - we mark message [%06d] "%s" as failed.',
+                    $message->getId(),
+                    substr($message->getHash(), 0, 6)
+                )
+            );
         }
     }
 }

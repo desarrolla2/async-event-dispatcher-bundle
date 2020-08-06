@@ -104,7 +104,7 @@ class MessageRepository extends EntityRepository
             ->andWhere('message.startAfter IS NULL or message.startAfter <= :now')
             ->setParameter('pending', State::PENDING)
             ->setParameter('now', new \DateTime())
-            ->addOrderBy('message.createdAt', 'DESC');
+            ->addOrderBy('message.createdAt', 'ASC');
 
         if ($limit) {
             $queryBuilder->setMaxResults($limit);
