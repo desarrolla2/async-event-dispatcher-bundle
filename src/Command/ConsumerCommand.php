@@ -99,8 +99,12 @@ class ConsumerCommand extends AbstractCommand
                 $output->writeln(' - there aren\'t  enough slot available.');
                 break;
             }
-
-            $this->executeMessage($message, $output);
+            try {
+                $this->executeMessage($message, $output);
+            } catch (\Exception $exception) {
+                $this->markAsFailed($message, $output);
+                throw $exception;
+            }
         }
         $this->markAsFailedNotFinalized($output);
     }
@@ -158,9 +162,21 @@ class ConsumerCommand extends AbstractCommand
             );
     }
 
-    private function markAsFailedNotFinalized(OutputInterface $output): void
+    private function markAsFailed(Message $message, OutputInterface $output): void
     {
         $manager = $this->get('desarrolla2_async_event_dispatcher.manager.message_manager');
+        $manager->update($message, State::FAILED);
+        $output->writeln(
+            sprintf(
+                ' - we mark message [%06d] "%s" as failed.',
+                $message->getId(),
+                substr($message->getHash(), 0, 6)
+            )
+        );
+    }
+
+    private function markAsFailedNotFinalized(OutputInterface $output): void
+    {
         $messages = $this->em->getRepository(Message::class)->findBy(
             [
                 'state' => State::EXECUTING,
@@ -178,14 +194,7 @@ class ConsumerCommand extends AbstractCommand
             if ($difference < $maxExecutionTime) {
                 continue;
             }
-            $manager->update($message, State::FAILED);
-            $output->writeln(
-                sprintf(
-                    ' - we mark message [%06d] "%s" as failed.',
-                    $message->getId(),
-                    substr($message->getHash(), 0, 6)
-                )
-            );
+            $this->markAsFailed($message, $output);
         }
     }
 }
