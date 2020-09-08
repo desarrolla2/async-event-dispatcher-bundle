@@ -112,13 +112,13 @@ class ConsumerCommand extends AbstractCommand
     private function formatSize(int $size): string
     {
         if ($size < 1000) {
-            return sprintf(' % dB', $size);
+            return sprintf('% dB', $size);
         }
         if ($size < 1000 ^ 2) {
-            return sprintf(' % dKB', round($size / 1000));
+            return sprintf('% dKB', round($size / 1000));
         }
 
-        return sprintf(' % dMB', round($size / 1000 / 1000));
+        return sprintf('% dMB', round($size / 1000 / 1000));
     }
 
     private function getExecutingSlots(): int
