@@ -18,16 +18,30 @@ use Desarrolla2\Timer\Formatter\Human;
 use Desarrolla2\Timer\Timer;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 abstract class AbstractCommand extends ContainerAwareCommand
 {
     use ContainerAwareTrait;
+
+    protected function finalize()
+    {
+        $mark = $this->timer->mark();
+        $this->output->writeln(
+            [
+                '',
+                sprintf(
+                    '# executed on "%s" and consumed "%s"',
+                    $mark['time']['from_start'],
+                    $mark['memory']['from_start']
+                ),
+                '',
+                '',
+            ]
+        );
+    }
 
     protected function get(string $serviceName)
     {
@@ -57,23 +71,6 @@ abstract class AbstractCommand extends ContainerAwareCommand
         );
     }
 
-    protected function finalize()
-    {
-        $mark = $this->timer->mark();
-        $this->output->writeln(
-            [
-                '',
-                sprintf(
-                    '# executed on "%s" and consumed "%s"',
-                    $mark['time']['from_start'],
-                    $mark['memory']['from_start']
-                ),
-                '',
-                '',
-            ]
-        );
-    }
-
     protected function log(string $message, array $parameters = [])
     {
         if (count($parameters)) {
@@ -92,6 +89,15 @@ abstract class AbstractCommand extends ContainerAwareCommand
     {
         $this->output->writeln(sprintf('attempting to notify to developers'));
         $mailer = $this->getContainer()->get('desarrolla2.exception_listener.mailer');
+        $this->output->writeln(
+            [
+                '',
+                sprintf('<error>message: "%s"</error>', $exception->getMessage()),
+                sprintf('<error>code: "%s"</error>', $exception->getCode()),
+                sprintf('<error>file: "%s":"%s"</error>', $exception->getFile(), $exception->getLine()),
+                sprintf('<error>trace: "%s"</error>', $exception->getTraceAsString()),
+            ]
+        );
 
         try {
             $mailer->notify($exception);

@@ -60,7 +60,15 @@ class ConsumerCommand extends AbstractCommand
         }
         $manager->update($message, State::EXECUTING);
         $output->writeln(
-            sprintf(' - executing "%s" with "%s" data', $message->getName(), $this->formatSize($message->getSize()))
+            [
+                sprintf(
+                    ' - executing "%s" with "%s" of data',
+                    $message->getName(),
+                    $this->formatSize($message->getSize())
+                ),
+                '',
+                json_encode($message->getData()),
+            ]
         );
         $eventDispatcher = $this->get('event_dispatcher');
         $eventDispatcher->dispatch(
@@ -102,7 +110,11 @@ class ConsumerCommand extends AbstractCommand
             try {
                 $this->executeMessage($message, $output);
             } catch (\Exception $exception) {
-                $this->markAsFailed($message, $output);
+                try {
+                    $this->markAsFailed($message, $output);
+                } catch (\Exception $exception2) {
+
+                }
                 throw $exception;
             }
         }
@@ -128,7 +140,7 @@ class ConsumerCommand extends AbstractCommand
         $messages = $repository->findBy(['state' => State::EXECUTING]);
         foreach ($messages as $message) {
             $messageSlots = $this->getMessageSlots($message);
-            $totalSlots += (int) $messageSlots;
+            $totalSlots += (int)$messageSlots;
         }
 
         return $totalSlots;
