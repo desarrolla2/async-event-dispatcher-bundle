@@ -42,6 +42,16 @@ class MessageManager
         return count($messages) ? array_values($messages)[0] : null;
     }
 
+    public function isExecuting(Message $message): bool
+    {
+        return State::EXECUTING === $message->getState();
+    }
+
+    public function isFailed(Message $message): bool
+    {
+        return State::FAILED === $message->getState();
+    }
+
     public function isFinish(Message $message): bool
     {
         return State::FINISH === $message->getState();

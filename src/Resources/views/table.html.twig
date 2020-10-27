@@ -11,7 +11,11 @@
   </tr>
   </thead>
   {% for message in messages %}
-    <tr>
+    <tr class="
+      {% if async_event_message_is_executing(message) %}success{% endif %}
+      {% if async_event_message_is_paused(message) %}warning{% endif %}
+      {% if async_event_message_is_failed(message) %}danger{% endif %}
+      ">
       <td class="text-right">{{ message.id }}</td>
       <td>{{ message.name }}
         {% if message.startAfter %}

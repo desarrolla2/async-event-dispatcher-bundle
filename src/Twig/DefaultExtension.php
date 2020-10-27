@@ -106,6 +106,9 @@ class DefaultExtension extends Twig_Extension
             new Twig_SimpleFunction('async_event_message_can_be_removed', [$this, 'canBeRemoved']),
             new Twig_SimpleFunction('async_event_message_can_be_played', [$this, 'canBePlayed']),
             new Twig_SimpleFunction('async_event_message_can_be_paused', [$this, 'canBePaused']),
+            new Twig_SimpleFunction('async_event_message_is_failed', [$this, 'isFailed']),
+            new Twig_SimpleFunction('async_event_message_is_paused', [$this, 'isPaused']),
+            new Twig_SimpleFunction('async_event_message_is_executing', [$this, 'isExecuting']),
             new Twig_SimpleFunction('async_event_count_pending', [$this, 'countPending']),
             new Twig_SimpleFunction(
                 'async_event_render_pending',
@@ -134,6 +137,21 @@ class DefaultExtension extends Twig_Extension
         $difference = $message->getStartedAt()->getTimestamp() - $message->getCreatedAt()->getTimestamp();
 
         return $this->formatTime($difference);
+    }
+
+    public function isExecuting(Message $message): bool
+    {
+        return $this->manager->isExecuting($message);
+    }
+
+    public function isFailed(Message $message): bool
+    {
+        return $this->manager->isFailed($message);
+    }
+
+    public function isPaused(Message $message): bool
+    {
+        return $this->manager->isPaused($message);
     }
 
     public function jsonEncode($value)
