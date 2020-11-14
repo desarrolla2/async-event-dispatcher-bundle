@@ -31,9 +31,7 @@ class AsyncEventDispatcher
         if ($event) {
             $data = $event->getData();
         }
-        $data = array_merge([Key::NUMBER_OF_SLOTS => 1], $data);
-
-        $this->manager->create($eventName, $data, $startAfter);
+        $this->manager->create($eventName, array_merge($this->getDefaultData(), $data), $startAfter);
     }
 
     public function dispatchUnlessThatExist(
@@ -48,5 +46,10 @@ class AsyncEventDispatcher
         }
 
         $this->dispatch($eventName, $event);
+    }
+
+    private function getDefaultData(): array
+    {
+        return [Key::NUMBER_OF_SLOTS => 1, Key::USER_ID => null];
     }
 }
