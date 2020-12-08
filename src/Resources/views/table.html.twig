@@ -58,7 +58,7 @@
     </tr>
     <tr id="async-event-{{ message.id }}" class="collapse"
         style="background: #0c4d5d; color: #fff;  overflow: auto;">
-      <td colspan="6">
+      <td colspan="7">
         {% for key,data in message.data %}
           <p style="margin: 0"><strong>{{ key }} </strong>: {{ data|async_event_message_json_encode }}</p>
         {% endfor %}
