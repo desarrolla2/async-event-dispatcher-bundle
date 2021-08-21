@@ -11,7 +11,7 @@
 
 namespace Desarrolla2\AsyncEventDispatcherBundle\Entity;
 
-abstract class State
+final class State
 {
     const FAILED = 'FAILED';
     const EXECUTING = 'EXECUTING';

@@ -3,6 +3,7 @@
 namespace Desarrolla2\AsyncEventDispatcherBundle\Manager;
 
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\Message;
+use Desarrolla2\AsyncEventDispatcherBundle\Entity\Priority;
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\State;
 use Doctrine\ORM\EntityManager;
 
@@ -16,7 +17,7 @@ class MessageManager
         $this->em = $em;
     }
 
-    public function create(string $name, array $data = [], \DateTime $startAfter = null, int $priority = 0): Message
+    public function create(string $name, array $data = [], \DateTime $startAfter = null, int $priority = Priority::NORMAL): Message
     {
         $message = new Message();
 

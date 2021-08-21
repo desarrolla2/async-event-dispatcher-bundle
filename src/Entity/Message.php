@@ -50,7 +50,7 @@ class Message
     /**
      * @ORM\Column(type="integer")
      */
-    private $priority = 0;
+    private $priority = Priority::NORMAL;
 
     /**
      * @ORM\Column(type="integer")

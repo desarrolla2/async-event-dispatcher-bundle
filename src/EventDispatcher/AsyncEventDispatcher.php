@@ -11,6 +11,7 @@
 
 namespace Desarrolla2\AsyncEventDispatcherBundle\EventDispatcher;
 
+use Desarrolla2\AsyncEventDispatcherBundle\Entity\Priority;
 use Desarrolla2\AsyncEventDispatcherBundle\Entity\State;
 use Desarrolla2\AsyncEventDispatcherBundle\Event\Event;
 use Desarrolla2\AsyncEventDispatcherBundle\Manager\MessageManager;
@@ -25,7 +26,7 @@ class AsyncEventDispatcher
         $this->manager = $manager;
     }
 
-    public function dispatch($eventName, Event $event = null, \DateTime $startAfter = null, int $priority = 0): void
+    public function dispatch($eventName, Event $event = null, \DateTime $startAfter = null, int $priority = Priority::NORMAL): void
     {
         $data = [];
         if ($event) {
