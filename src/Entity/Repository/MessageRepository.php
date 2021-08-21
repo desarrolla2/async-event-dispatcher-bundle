@@ -24,9 +24,9 @@ use Doctrine\ORM\EntityRepository;
 class MessageRepository extends EntityRepository
 {
     /**
-     * @param string   $name
-     * @param array    $search
-     * @param array    $states
+     * @param string $name
+     * @param array $search
+     * @param array $states
      * @param int|null $limit
      * @return Message[]
      */
@@ -104,6 +104,7 @@ class MessageRepository extends EntityRepository
             ->andWhere('message.startAfter IS NULL or message.startAfter <= :now')
             ->setParameter('pending', State::PENDING)
             ->setParameter('now', new \DateTime())
+            ->addOrderBy('message.priority', 'DESC')
             ->addOrderBy('message.createdAt', 'ASC');
 
         if ($limit) {

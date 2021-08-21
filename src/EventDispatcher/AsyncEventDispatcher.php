@@ -25,13 +25,13 @@ class AsyncEventDispatcher
         $this->manager = $manager;
     }
 
-    public function dispatch($eventName, Event $event = null, \DateTime $startAfter = null): void
+    public function dispatch($eventName, Event $event = null, \DateTime $startAfter = null, int $priority = 0): void
     {
         $data = [];
         if ($event) {
             $data = $event->getData();
         }
-        $this->manager->create($eventName, array_merge($this->getDefaultData(), $data), $startAfter);
+        $this->manager->create($eventName, array_merge($this->getDefaultData(), $data), $startAfter, $priority);
     }
 
     public function dispatchUnlessThatExist(

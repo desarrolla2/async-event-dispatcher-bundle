@@ -19,8 +19,12 @@
       <td class="text-right">{{ message.id }}</td>
       <td>{{ message.name }}
         {% if message.startAfter %}
-          <span class="label label-default"><i class="fa fa-fw fa-clock-o"></i> {{ message.startAfter|localizeddate() }}</span>
-        {% endif %}</td>
+          <span class="label label-default"><i class="fa fa-fw fa-clock-o"></i> start after {{ message.startAfter|localizeddate() }}</span>
+        {% endif %}
+        {% if message.priority != 0 %}
+          <span class="label label-default"><i class="fa fa-fw fa-bolt"></i> priority {{ message.priority }}</span>
+        {% endif %}
+      </td>
       <td class="text-right">{{ message.size|async_event_message_format_size }}</td>
       <td class="text-right">{{ message.createdAt|time_ago_in_words }}</td>
       <td class="text-right">{{ async_event_message_get_time_to_start(message) }}</td>

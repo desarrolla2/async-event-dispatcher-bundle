@@ -16,7 +16,7 @@ class MessageManager
         $this->em = $em;
     }
 
-    public function create(string $name, array $data = [], \DateTime $startAfter = null): Message
+    public function create(string $name, array $data = [], \DateTime $startAfter = null, int $priority = 0): Message
     {
         $message = new Message();
 
@@ -24,6 +24,7 @@ class MessageManager
         $message->setName($name);
         $message->setData($data);
         $message->setStartAfter($startAfter);
+        $message->setPriority($priority);
         $message->setSize(strlen(json_encode($data)));
         $message->setState(State::PENDING);
         $message->setCreatedAt(new\DateTime());

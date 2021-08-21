@@ -50,6 +50,11 @@ class Message
     /**
      * @ORM\Column(type="integer")
      */
+    private $priority = 0;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
     private $size = 0;
 
     /**
@@ -76,6 +81,16 @@ class Message
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $updatedAt;
+
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): void
+    {
+        $this->priority = $priority;
+    }
 
     public function getCreatedAt(): DateTime
     {
@@ -150,7 +165,7 @@ class Message
 
     public function setHash($hash): void
     {
-        $this->hash = (string) $hash;
+        $this->hash = (string)$hash;
     }
 
     public function setId($id): void
